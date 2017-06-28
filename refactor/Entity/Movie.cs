@@ -27,6 +27,29 @@ namespace refactor.Entity {
 			this.Movie = _movie;
 			this.DaysRented = _days_rented;
 		}
+
+		public double GetCharge() {
+			double result = 0;
+
+			switch( Movie.PriceCode ) {
+				case Movie.REGULAR:
+					result += 2;
+					if( DaysRented > 2 ) {
+						result += ( DaysRented - 2 ) * 1.5;
+					}
+					break;
+				case Movie.NEW_RELEASE:
+					result += DaysRented * 3;
+					break;
+				case Movie.CHILDREDNS:
+					result += 1.5;
+					if( DaysRented > 3 ) {
+						result += ( DaysRented - 3 ) * 1.5;
+					}
+					break;
+			}
+			return result;
+		}
 	}
 
 	public class Customer {
@@ -43,28 +66,7 @@ namespace refactor.Entity {
 			this._rentals.Add( _rental );
 		}
 
-		private double AmountFor( Rental rental ) {
-			double result = 0;
 
-			switch( rental.Movie.PriceCode ) {
-				case Movie.REGULAR:
-					result += 2;
-					if( rental.DaysRented > 2 ) {
-						result += ( rental.DaysRented - 2 ) * 1.5;
-					}
-					break;
-				case Movie.NEW_RELEASE:
-					result += rental.DaysRented * 3;
-					break;
-				case Movie.CHILDREDNS:
-					result += 1.5;
-					if( rental.DaysRented > 3 ) {
-						result += ( rental.DaysRented - 3 ) * 1.5;
-					}
-					break;
-			}
-			return result;
-		}
 
 		public string Statement() {
 			double total_amount = 0;
@@ -75,7 +77,7 @@ namespace refactor.Entity {
 			foreach( Rental each in _rentals ) {
 				double this_amount = 0;
 
-				this_amount = AmountFor( each );
+				this_amount = each.GetCharge();
 
 
 				frequent_renter_points++;
