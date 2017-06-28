@@ -75,19 +75,14 @@ namespace refactor.Entity {
 			string result = "Rental Record for " + Name + "\n";
 			
 			foreach( Rental each in _rentals ) {
-				double this_amount = 0;
-
-				this_amount = each.GetCharge();
-
-
 				frequent_renter_points++;
 
 				if( each.Movie.PriceCode == Movie.NEW_RELEASE && (each.DaysRented > 1)) {
 					frequent_renter_points++;
 				}
 
-				result += "\t" + each.Movie.Title + "\t" + this_amount.ToString() + "\n";
-				total_amount += this_amount;
+				result += "\t" + each.Movie.Title + "\t" + each.GetCharge().ToString() + "\n";
+				total_amount += each.GetCharge();
 			}
 
 			result += "Amount owed is " + total_amount.ToString() + "\n";
