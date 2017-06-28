@@ -50,6 +50,14 @@ namespace refactor.Entity {
 			}
 			return result;
 		}
+
+		public int GetFrequentRenterPoints() {
+			if( Movie.PriceCode == Movie.NEW_RELEASE && ( DaysRented > 1 ) ) {
+				return 2;
+			} else {
+				return 1;
+			}
+		}
 	}
 
 	public class Customer {
@@ -66,27 +74,35 @@ namespace refactor.Entity {
 			this._rentals.Add( _rental );
 		}
 
+		private double GetTotalCharge() {
+			double result = 0;
 
-
-		public string Statement() {
-			double total_amount = 0;
-			int frequent_renter_points = 0;
-
-			string result = "Rental Record for " + Name + "\n";
-			
 			foreach( Rental each in _rentals ) {
-				frequent_renter_points++;
-
-				if( each.Movie.PriceCode == Movie.NEW_RELEASE && (each.DaysRented > 1)) {
-					frequent_renter_points++;
-				}
-
-				result += "\t" + each.Movie.Title + "\t" + each.GetCharge().ToString() + "\n";
-				total_amount += each.GetCharge();
+				result += each.GetCharge();
 			}
 
-			result += "Amount owed is " + total_amount.ToString() + "\n";
-			result += "You earned " + frequent_renter_points.ToString() + " frequent renter points";
+			return result;
+		}
+
+		private int GetTotalFrequentRenterPoints() {
+			int result = 0;
+
+			foreach( Rental each in _rentals ) {
+				result += each.GetFrequentRenterPoints();
+			}
+
+			return result;
+		}
+
+		public string Statement() {
+			string result = "Rental Record for " + Name + "\n";
+
+			foreach( Rental each in _rentals ) {
+				result += "\t" + each.Movie.Title + "\t" + each.GetCharge().ToString() + "\n";
+			}
+
+			result += "Amount owed is " + GetTotalCharge().ToString() + "\n";
+			result += "You earned " + GetTotalFrequentRenterPoints().ToString() + " frequent renter points";
 			return result;
 		}
 		
