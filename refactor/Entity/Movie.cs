@@ -17,6 +17,29 @@ namespace refactor.Entity {
 			Title = _title;
 			PriceCode = _price_code;
 		}
+
+		public double GetCharge( int _day_rented) {
+			double result = 0;
+
+			switch( PriceCode ) {
+				case Movie.REGULAR:
+					result += 2;
+					if( _day_rented > 2 ) {
+						result += ( _day_rented - 2 ) * 1.5;
+					}
+					break;
+				case Movie.NEW_RELEASE:
+					result += _day_rented * 3;
+					break;
+				case Movie.CHILDREDNS:
+					result += 1.5;
+					if( _day_rented > 3 ) {
+						result += ( _day_rented - 3 ) * 1.5;
+					}
+					break;
+			}
+			return result;
+		}
 	}
 
 	public class Rental {
@@ -29,26 +52,7 @@ namespace refactor.Entity {
 		}
 
 		public double GetCharge() {
-			double result = 0;
-
-			switch( Movie.PriceCode ) {
-				case Movie.REGULAR:
-					result += 2;
-					if( DaysRented > 2 ) {
-						result += ( DaysRented - 2 ) * 1.5;
-					}
-					break;
-				case Movie.NEW_RELEASE:
-					result += DaysRented * 3;
-					break;
-				case Movie.CHILDREDNS:
-					result += 1.5;
-					if( DaysRented > 3 ) {
-						result += ( DaysRented - 3 ) * 1.5;
-					}
-					break;
-			}
-			return result;
+			return Movie.GetCharge( DaysRented );
 		}
 
 		public int GetFrequentRenterPoints() {
