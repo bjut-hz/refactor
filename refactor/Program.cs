@@ -7,10 +7,10 @@ using refactor.Entity;
 
 namespace refactor {
 	class Program {
-		static void Main( string[] args ) {
+		 static void Main( string[] args ) {
 			Movie movie1 = new Movie( "X-man", Movie.REGULAR );
 			Movie movie2 = new Movie( "Captain American", Movie.NEW_RELEASE );
-			Movie movie3 = new Movie( "Mario", Movie.CHILDREDNS );
+			Movie movie3 = new Movie( "Mario", Movie.CHILDRENS );
 
 			Customer hz = new Customer( "bjut-hz" );
 			Rental rental1 = new Rental( movie1, 7 );

@@ -6,57 +6,46 @@ using System.Threading.Tasks;
 
 namespace refactor.Entity {
 	public class Movie {
-		public const int CHILDREDNS = 2;
+		public const int CHILDRENS = 2;
 		public const int REGULAR = 0;
 		public const int NEW_RELEASE = 1;
 
 		public string Title { get; set; }
-		public int PriceCode { get; set; }
 
-		public Movie( string _title, int _price_code ) {
-			Title = _title;
-			PriceCode = _price_code;
+		private int PriceCode { get; }
+
+		public Movie( string title, int priceCode ) {
+			Title = title;
+			PriceCode = priceCode;
 		}
 
-		public double GetCharge( int _day_rented) {
+		public double GetCharge( int dayRented) {
 			double result = 0;
 
 			switch( PriceCode ) {
 				case Movie.REGULAR:
 					result += 2;
-					if( _day_rented > 2 ) {
-						result += ( _day_rented - 2 ) * 1.5;
+					if( dayRented > 2 ) {
+						result += ( dayRented - 2 ) * 1.5;
 					}
 					break;
 				case Movie.NEW_RELEASE:
-					result += _day_rented * 3;
+					result += dayRented * 3;
 					break;
-				case Movie.CHILDREDNS:
+				case Movie.CHILDRENS:
 					result += 1.5;
-					if( _day_rented > 3 ) {
-						result += ( _day_rented - 3 ) * 1.5;
+					if( dayRented > 3 ) {
+						result += ( dayRented - 3 ) * 1.5;
 					}
+					break;
+				default:
 					break;
 			}
 			return result;
 		}
-	}
 
-	public class Rental {
-		public Movie Movie { get; set; }
-		public int DaysRented { get; set; }
-
-		public Rental( Movie _movie, int _days_rented ) {
-			this.Movie = _movie;
-			this.DaysRented = _days_rented;
-		}
-
-		public double GetCharge() {
-			return Movie.GetCharge( DaysRented );
-		}
-
-		public int GetFrequentRenterPoints() {
-			if( Movie.PriceCode == Movie.NEW_RELEASE && ( DaysRented > 1 ) ) {
+		public int GetFrequentRenterPoints( int dayRented ) {
+			if( PriceCode == Movie.NEW_RELEASE && ( dayRented > 1 ) ) {
 				return 2;
 			} else {
 				return 1;
@@ -64,49 +53,55 @@ namespace refactor.Entity {
 		}
 	}
 
+	public class Rental {
+		public Movie Movie { get; }
+		private int DaysRented { get; }
+
+		public Rental( Movie movie, int daysRented ) {
+			this.Movie = movie;
+			this.DaysRented = daysRented;
+		}
+
+		public double GetCharge() {
+			return Movie.GetCharge( DaysRented );
+		}
+
+		public int GetFrequentRenterPoints() {
+			return Movie.GetFrequentRenterPoints( DaysRented );
+		}
+	}
+
 	public class Customer {
-		public string Name { get; set; }
+		private string Name { get; set; }
 
-		private List<Rental> _rentals;
+		private readonly List<Rental> _rentals;
 
-		public Customer(string _name ) {
-			this.Name = _name;
+		public Customer(string name ) {
+			this.Name = name;
 			_rentals = new List<Rental>();
 		}
 
-		public void AddRental( Rental _rental ) {
-			this._rentals.Add( _rental );
+		public void AddRental( Rental rental ) {
+			this._rentals.Add( rental );
 		}
 
-		private double GetTotalCharge() {
-			double result = 0;
-
-			foreach( Rental each in _rentals ) {
-				result += each.GetCharge();
-			}
-
-			return result;
+		private double GetTotalCharge()
+		{
+			return _rentals.Sum(each => each.GetCharge());
 		}
 
-		private int GetTotalFrequentRenterPoints() {
-			int result = 0;
-
-			foreach( Rental each in _rentals ) {
-				result += each.GetFrequentRenterPoints();
-			}
-
-			return result;
+		private int GetTotalFrequentRenterPoints()
+		{
+			return _rentals.Sum(each => each.GetFrequentRenterPoints());
 		}
 
 		public string Statement() {
 			string result = "Rental Record for " + Name + "\n";
 
-			foreach( Rental each in _rentals ) {
-				result += "\t" + each.Movie.Title + "\t" + each.GetCharge().ToString() + "\n";
-			}
+			result = _rentals.Aggregate(result, (current, each) => current + ("\t" + each.Movie.Title + "\t" + each.GetCharge() + "\n"));
 
-			result += "Amount owed is " + GetTotalCharge().ToString() + "\n";
-			result += "You earned " + GetTotalFrequentRenterPoints().ToString() + " frequent renter points";
+			result += "Amount owed is " + GetTotalCharge() + "\n";
+			result += "You earned " + GetTotalFrequentRenterPoints() + " frequent renter points";
 			return result;
 		}
 		
