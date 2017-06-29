@@ -10,45 +10,51 @@ namespace refactor.Entity {
 		public const int REGULAR = 0;
 		public const int NEW_RELEASE = 1;
 
+		private Price _price;
+
 		public string Title { get; private set; }
 
-		protected Movie( string title ) {
+		public Movie( string title, int priceCode ) {
 			Title = title;
+			SetPriceCode( priceCode );
 		}
 
-		public virtual double GetCharge( int dayRented ) {
-			return 0;
+		public double GetCharge( int dayRented ) {
+			return _price.GetCharge( dayRented );
 		}
 
+		public void SetPriceCode( int arg ) {
+			switch( arg ) {
+				case REGULAR:
+					_price = new RegularPrice();
+					break;
+				case CHILDRENS:
+					_price = new ChildrensPrice();
+					break;
+				case NEW_RELEASE:
+					_price = new NewReleasePrice();
+					break;
+				default:
+					break;
+			}
+		}
+
+
+		public int GetFrequentRenterPoints( int dayRented ) {
+			return _price.GetFrequentRenterPoints( dayRented );
+		}
+	}
+
+	public abstract class Price {
+		public abstract double GetCharge( int dayRented );
 		public virtual int GetFrequentRenterPoints( int dayRented ) {
 			return 1;
 		}
+
+		public abstract int GetPriceCode();
 	}
 
-	public class ChildrensMovie : Movie {
-		public ChildrensMovie( string title ) : base( title ) {
-
-		}
-
-		public override double GetCharge( int dayRented ) {
-			double result = 0;
-			result += 1.5;
-			if( dayRented > 3 ) {
-				result += ( dayRented - 3 ) * 1.5;
-			}
-			return result;
-		}
-
-		public override int GetFrequentRenterPoints( int dayRented ) {
-			return base.GetFrequentRenterPoints( dayRented );
-		}
-	}
-
-	public class RegularMovie : Movie {
-		public RegularMovie( string title ) : base( title ) {
-
-		}
-
+	public class RegularPrice : Price {
 		public override double GetCharge( int dayRented ) {
 			double result = 0;
 			result += 2;
@@ -61,13 +67,32 @@ namespace refactor.Entity {
 		public override int GetFrequentRenterPoints( int dayRented ) {
 			return base.GetFrequentRenterPoints( dayRented );
 		}
+
+		public override int GetPriceCode() {
+			return Movie.REGULAR;
+		}
 	}
 
-	public class NewReleaseMovie : Movie {
-		public NewReleaseMovie( string title ) : base( title ) {
-
+	public class ChildrensPrice : Price {
+		public override double GetCharge( int dayRented ) {
+			double result = 0;
+			result += 1.5;
+			if( dayRented > 3 ) {
+				result += ( dayRented - 3 ) * 1.5;
+			}
+			return result;
 		}
 
+		public override int GetFrequentRenterPoints( int dayRented ) {
+			return base.GetFrequentRenterPoints( dayRented );
+		}
+
+		public override int GetPriceCode() {
+			return Movie.CHILDRENS;
+		}
+	}
+
+	public class NewReleasePrice : Price {
 		public override double GetCharge( int dayRented ) {
 			return dayRented * 3;
 		}
@@ -78,6 +103,10 @@ namespace refactor.Entity {
 			} else {
 				return 1;
 			}
+		}
+
+		public override int GetPriceCode() {
+			return Movie.NEW_RELEASE;
 		}
 	}
 
